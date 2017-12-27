@@ -45,6 +45,10 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "random": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "deque": "cpp",
+        "mutex": "cpp",
+        "stack": "cpp",
+        "string": "cpp"
     }
 }
