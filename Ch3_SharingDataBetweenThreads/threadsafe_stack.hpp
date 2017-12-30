@@ -8,7 +8,7 @@
 #include <stack>
 
 
-struct empty_stack : std::exception
+struct empty_stack : std::runtime_error
 {
     const char* what() const noexcept;
 };

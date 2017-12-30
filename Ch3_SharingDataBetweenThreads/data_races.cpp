@@ -26,3 +26,66 @@
 ** */
 
 // TODO: add a data-race example (avoiding data races)
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <random>
+#include <utility>
+#include <vector>
+
+
+template<typename Action>
+class periodic_action
+{
+    static std::default_random_engine re;
+    std::uniform_int_distribution<> ud;
+    Action action;
+    int ticks;
+public:
+    explicit periodic_action(Action action_, int low, int high, int ticks_)
+        : ud(low, high), action(action_), ticks(ticks_) { }
+    template<typename... Args>
+    void operator()(Args&&... args){
+        if(ticks){
+        for(int i=0; i<ticks; ++i){
+            int t = ud(re);
+            action(std::forward<Args>(args)...);
+            std::this_thread::sleep_for(std::chrono::milliseconds(t));
+        }
+        }
+        else{
+            while(true){
+                int t = ud(re);
+                action(std::forward<Args>(args)...);
+                std::this_thread::sleep_for(std::chrono::milliseconds(t));
+            }
+        }
+    }
+};
+
+
+template<typename Action>
+std::default_random_engine periodic_action<Action>::re{std::chrono::system_clock::now().time_since_epoch().count()};
+
+
+int main()
+{
+
+    unsigned int var{0};
+    // start a few threads which add +1 to var and print the value
+    auto action = [&var]{
+        ++var;
+        std::cout <<"thread[" << std::this_thread::get_id()
+            << "]: " << var << std::endl;
+    };
+    // values printed might not be consecutive due to data races
+    std::vector<std::thread> vt;
+    for(int i=0; i<10; ++i){
+        vt.emplace_back(periodic_action<decltype(action)>(action,1000, 1000, 5));
+    }
+    for(auto it = vt.begin(); it != vt.end(); ++it){
+        it->join();
+    }
+
+}
