@@ -63,8 +63,6 @@ public:
         }
     }
 };
-
-
 template<typename Action>
 std::default_random_engine periodic_action<Action>::re{std::chrono::system_clock::now().time_since_epoch().count()};
 
