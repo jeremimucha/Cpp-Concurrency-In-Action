@@ -49,6 +49,14 @@
         "deque": "cpp",
         "mutex": "cpp",
         "stack": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "condition_variable": "cpp",
+        "map": "cpp",
+        "queue": "cpp",
+        "shared_mutex": "cpp",
+        "sstream": "cpp",
+        "xtree": "cpp",
+        "atomic": "cpp",
+        "future": "cpp"
     }
 }
