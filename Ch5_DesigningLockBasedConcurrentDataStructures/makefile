@@ -5,7 +5,7 @@ CXX = g++
 SRC = $(wildcard *.cpp)
 BINS = $(patsubst %.cpp, %.exe, $(SRC))
 OBJ = $(patsubst %.cpp, %.o, $(BINS))
-DEPS = 
+DEPS = $(wildcard *.hpp)
 
 
 all: $(BINS)
