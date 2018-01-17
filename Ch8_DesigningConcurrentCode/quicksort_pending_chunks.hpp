@@ -1,10 +1,11 @@
 #ifndef QUICKSORT_PENDING_CHUNKS_
 #define QUICKSORT_PENDING_CHUNKS_
 
+#include <iostream>
 #include <list>
 #include <vector>
 #include <future>
-#include <future>
+#include <algorithm>
 #include <atomic>
 #include "threadsafe_stack.hpp"
 
@@ -15,7 +16,7 @@ struct sorter
     struct chunk_to_sort
     {
         std::list<T> data;
-        std::promise<list<T>> promise;
+        std::promise<std::list<T>> promise;
     };
 
 // --- member variables
@@ -23,6 +24,7 @@ struct sorter
     std::vector<std::thread> threads;
     const unsigned max_thread_count;
     std::atomic<bool> end_of_data;
+// ---
 
     sorter()
         : max_thread_count( std::thread::hardware_concurrency()-1 )
@@ -32,14 +34,17 @@ struct sorter
     ~sorter()
     {
         end_of_data = true;
-        for( const auto it = threads.begin(); it!=threads.end(); ++it){
-            it->join();
+        for(unsigned i=0; i<threads.size(); ++i){
+            threads[i].join();
         }
+        // for( auto it = threads.begin(); it!=threads.end(); ++it){
+        //     it->join();
+        // }
     }
 
     void try_sort_chunk()
     {
-        auto chunk( std::make_shared<chunk_to_sort>(chunks.pop()) );
+        std::shared_ptr<chunk_to_sort> chunk( chunks.wait_and_pop() );
         if( chunk ){
             sort_chunk(chunk);
         }
@@ -57,7 +62,7 @@ struct sorter
 
         auto div_point = std::partition( chunk_data.begin(), chunk_data.end()
                                        , [&partition_val](const T& val)
-                                         {return val < partition_val}
+                                         {return val < partition_val;}
                                        );
         
         chunk_to_sort new_lower_chunk;
@@ -71,7 +76,7 @@ struct sorter
             threads.push_back( std::thread(&sorter<T>::sort_thread, this) );
         }
 
-        std:list<T> new_higher(do_sort(chunk_data));
+        std::list<T> new_higher(do_sort(chunk_data));
 
         result.splice(result.end(), new_higher);
         while( new_lower.wait_for(std::chrono::seconds(0)) !=
@@ -90,6 +95,8 @@ struct sorter
 
     void sort_thread()
     {
+        std::cerr << "thread[" << std::this_thread::get_id()
+            << "] started." << std::endl;
         while(!end_of_data){
             try_sort_chunk();
             std::this_thread::yield();
