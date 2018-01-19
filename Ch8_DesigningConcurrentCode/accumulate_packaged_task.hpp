@@ -11,6 +11,8 @@
 */
 
 #include <algorithm>
+#include <numeric>
+#include <vector>
 #include <future>
 #include <thread>
 
@@ -43,7 +45,7 @@ struct accumulate_block
 template<typename Iterator, typename T>
 T parallel_accumulate(Iterator first, Iterator last, T init)
 {
-    const unsigned long lenght = std::distance(first, last);
+    const unsigned long length = std::distance(first, last);
 
     if(!length)
         return init;
@@ -53,14 +55,14 @@ T parallel_accumulate(Iterator first, Iterator last, T init)
 
     const unsigned long hardware_threads = std::thread::hardware_concurrency();
     const unsigned long num_threads =
-        std::min( (hardware_threads!=0 ? hadrware_threads : 2), max_threads );
+        std::min( (hardware_threads!=0 ? hardware_threads : 2), max_threads );
     
     const unsigned long block_size = length / num_threads;
 
     std::vector<std::future<T>> futures;
-    futures.reserve(num_threads-1)
+        futures.reserve(num_threads-1);
     std::vector<std::thread> threads;
-    threads.reserve(num_threads-1);
+        threads.reserve(num_threads-1);
     // object similiar to scoped_thread - make sure all the threads are
     // .join()'ed on scope exit - this provides exception safety
     // ensuring that all threads are .joined and destoyed correctly
@@ -77,7 +79,7 @@ T parallel_accumulate(Iterator first, Iterator last, T init)
         block_start = block_end;
     }
 
-    T last_result = accumulate_block()(block_start, last);
+    T last_result = accumulate_block<Iterator,T>()(block_start, last);
     T result = init;
     for(auto it = futures.cbegin(); it!=futures.cend(); ++it){
         result += it->get();

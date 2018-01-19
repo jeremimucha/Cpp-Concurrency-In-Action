@@ -18,6 +18,7 @@
 
 
 #include <algorithm>
+#include <numeric>
 #include <future>
 
 

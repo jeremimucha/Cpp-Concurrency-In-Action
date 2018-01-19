@@ -57,6 +57,7 @@
         "sstream": "cpp",
         "xtree": "cpp",
         "atomic": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "xxatomic": "cpp"
     }
 }
