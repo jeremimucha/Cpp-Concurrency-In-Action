@@ -58,6 +58,19 @@
         "xtree": "cpp",
         "atomic": "cpp",
         "future": "cpp",
-        "xxatomic": "cpp"
+        "xxatomic": "cpp",
+        "cctype": "cpp",
+        "ctime": "cpp",
+        "fstream": "cpp",
+        "iomanip": "cpp",
+        "iterator": "cpp",
+        "locale": "cpp",
+        "numeric": "cpp",
+        "regex": "cpp",
+        "set": "cpp",
+        "xlocbuf": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xloctime": "cpp"
     }
 }
