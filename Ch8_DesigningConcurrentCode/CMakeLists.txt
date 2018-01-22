@@ -1,23 +1,17 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 
 project(DesigningConcurrentCode)
 
 set( CMAKE_CXX_STANDARD 17 )
 
-add_subdirectory( libs/Catch2 )
+add_subdirectory( tests )
 
+file( GLOB target_sources RELATIVE "${PROJECT_SOURCE_DIR}"
+      "${PROJECT_SOURCE_DIR}/*.cpp" )
 
-###############################################################################
-# Unit Tests
-
-# enable CTest testing
-enable_testing()
-
-# Add a testing executable
-add_executable( catch_unit_tests catch_unit_tests.cpp )
-
-target_link_libraries( catch_unit_tests
-                       Catch::Test
-                     )
-
-add_test( test_all catch_unit_tests )
+foreach( target ${target_sources} )
+  string(REGEX MATCH "^[^ .]*" fname ${target} )
+  MESSAGE( STATUS "Executable: ${fname}" )
+  add_executable( ${fname} ${target} )
+  target_include_directories( ${fname} PUBLIC ${PROJECT_SOURCE_DIR} )
+endforeach(target)
